@@ -18,14 +18,14 @@ local function getPlayerCount()
     return count
 end
 
-local function checkPlayers()
+local function checkForPlayers()
     if gamestarted then return end
 
     if getPlayerCount() >= 1 then
         Console.Execute("Kyber.StartGame")
         gamestarted = true
     else
-        SetTimeout(checkPlayers, 5.0) -- checks every 5 seconds if a bot was added
+        SetTimeout(checkForPlayers, 5.0) -- checks every 5 seconds if a bot was added
     end
 end
 
@@ -37,7 +37,7 @@ EventManager.Listen("Level:Loaded", function(level, mode)
             gamestarted = true
         else
             print("Waiting for a player or bot")
-            SetTimeout(checkPlayers, 5.0)
+            SetTimeout(checkForPlayers, 5.0)
         end
     end, 23.0)
 end)
