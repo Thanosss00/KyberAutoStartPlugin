@@ -3,7 +3,7 @@ require "common/timer"
 local gamestarted = false
 
 local function getPlayerCount()
-    -- Count up the current human players
+    -- Count all players, including bots
     local count = 0
 
     local players = PlayerManager.GetPlayers()
@@ -12,15 +12,21 @@ local function getPlayerCount()
     end
 
     for _, player in ipairs(players) do
-        if player.isBot then
-            goto continue
-        end
-
         count = count + 1
-            ::continue::
-        end
+    end
 
     return count
+end
+
+local function checkPlayers()
+    if gamestarted then return end
+
+    if getPlayerCount() >= 1 then
+        Console.Execute("Kyber.StartGame")
+        gamestarted = true
+    else
+        SetTimeout(checkPlayers, 5.0) -- checks every 5 seconds if a bot was added
+    end
 end
 
 EventManager.Listen("Level:Loaded", function(level, mode)
@@ -30,7 +36,8 @@ EventManager.Listen("Level:Loaded", function(level, mode)
             Console.Execute("Kyber.StartGame")
             gamestarted = true
         else
-            print("Waiting for a player")
+            print("Waiting for a player or bot")
+            SetTimeout(checkPlayers, 5.0)
         end
     end, 23.0)
 end)
